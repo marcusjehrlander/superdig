@@ -7,8 +7,6 @@ import sys
 import json
 import ipwhois
 from ipwhois import IPWhois
-from pprint import pprint
-
 
 def main():
     # Searching with built in DNS-server
