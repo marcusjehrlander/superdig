@@ -20,23 +20,27 @@ def main():
         for rdata in arecord:
             cleanarecord = str(rdata)
     except dns.resolver.NXDOMAIN:
-        print('IP-address entered, only checking WHOIS information and PTR record.')
-        whoislookup = IPWhois(searchobject)
-        whoislookupresults = whoislookup.lookup_rdap(depth=1)
-        for results in whoislookupresults:
-            asn = whoislookupresults['asn']
-            asnnetwork = whoislookupresults['asn_cidr']
-            asncountry = whoislookupresults['asn_country_code']
-            asndescription = whoislookupresults['asn_description']
-            asnregistrar = whoislookupresults['asn_registry']
-        ptrrecord = dns.reversename.from_address(searchobject)
-        print("ASN is:", asn)
-        print("ASN network is:", asnnetwork)
-        print("ASN description is:", asndescription)
-        print("ASN country is:", asncountry)
-        print("ASN registrar is:", asnregistrar)
-        print("PTR record is:", ptrrecord)
-        sys.exit()
+        try:
+            print('IP-address entered or invalid host entered, only checking WHOIS information and PTR record.')
+            whoislookup = IPWhois(searchobject)
+            whoislookupresults = whoislookup.lookup_rdap(depth=1)
+            for results in whoislookupresults:
+                asn = whoislookupresults['asn']
+                asnnetwork = whoislookupresults['asn_cidr']
+                asncountry = whoislookupresults['asn_country_code']
+                asndescription = whoislookupresults['asn_description']
+                asnregistrar = whoislookupresults['asn_registry']
+            ptrrecord = dns.reversename.from_address(searchobject)
+            print("ASN is:", asn)
+            print("ASN network is:", asnnetwork)
+            print("ASN description is:", asndescription)
+            print("ASN country is:", asncountry)
+            print("ASN registrar is:", asnregistrar)
+            print("PTR record is:", ptrrecord)
+            sys.exit()
+        except ValueError:
+            print('Nothing found.')
+            sys.exit()
     cnamerecord = dns.resolver.query(searchobject, 'CNAME', raise_on_no_answer=False)
     if cnamerecord.rrset is None:
         cleancnamerecord = str('None')
@@ -128,10 +132,13 @@ def main():
         for rdata in nsrecord:
             cleansnsrecord2 = str(rdata)
     except dns.resolver.NoAnswer:
-        print('None found.')
-    mxsrecord = dns.resolver.query(searchobject, 'MX')
-    for rdata in mxsrecord: 
-        cleanmxrecord2 = str(rdata)  
+        cleansnsrecord2 = str('None found')
+    try:
+        mxsrecord = dns.resolver.query(searchobject, 'MX')
+        for rdata in mxsrecord: 
+            cleanmxrecord2 = str(rdata)  
+    except dns.resolver.NoAnswer:
+        cleanmxrecord2 = str('None')
     ptrrecord = dns.reversename.from_address(cleanarecord2)
     whoislookup = IPWhois(cleanarecord2)
     whoislookupresults2 = whoislookup.lookup_rdap(depth=1)
