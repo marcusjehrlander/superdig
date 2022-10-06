@@ -48,7 +48,7 @@ def main():
         for rdata in nsrecord:
             cleansnsrecord = str(rdata)
     except dns.resolver.NoAnswer:
-         print('None found')
+         cleansnsrecord = str('None found')
     try:
         mxsrecord = dns.resolver.query(searchobject, 'MX')
         for rdata in mxsrecord: 
@@ -77,7 +77,7 @@ def main():
     print('Information found using system DNS settings:')
     print("A record:", cleanarecord)
     print("CNAME record:", cleancnamerecord)
-    #print("NS record:", cleansnsrecord)
+    print("NS record:", cleansnsrecord)
     print("MX record:", cleanmxrecord)   
     print("ASN is:", asn)
     print("ASN network is:", asnnetwork)
