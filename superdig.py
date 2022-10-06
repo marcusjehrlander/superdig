@@ -2,11 +2,13 @@
 
 # Modules
 import socket
-import dns.resolver
+import dns.resolver, dns.reversename
 import sys
 import json
 import ipwhois
 from ipwhois import IPWhois
+
+
 
 def main():
     # Searching with built in DNS-server
@@ -18,7 +20,7 @@ def main():
         for rdata in arecord:
             cleanarecord = str(rdata)
     except dns.resolver.NXDOMAIN:
-        print('IP-address entered, only checking WHOIS information.')
+        print('IP-address entered, only checking WHOIS information and PTR record.')
         whoislookup = IPWhois(searchobject)
         whoislookupresults = whoislookup.lookup_rdap(depth=1)
         for results in whoislookupresults:
@@ -27,11 +29,13 @@ def main():
             asncountry = whoislookupresults['asn_country_code']
             asndescription = whoislookupresults['asn_description']
             asnregistrar = whoislookupresults['asn_registry']
+        ptrrecord = dns.reversename.from_address(searchobject)
         print("ASN is:", asn)
         print("ASN network is:", asnnetwork)
         print("ASN description is:", asndescription)
         print("ASN country is:", asncountry)
         print("ASN registrar is:", asnregistrar)
+        print("PTR record is:", ptrrecord)
         sys.exit()
     cnamerecord = dns.resolver.query(searchobject, 'CNAME', raise_on_no_answer=False)
     if cnamerecord.rrset is None:
@@ -64,6 +68,8 @@ def main():
             asncountry = ('Private IP, no information availible.')
             asndescription = ('Private IP, no information availible.')
             asnregistrar = ('Private IP, no information availible.')
+    ptrrecord = dns.reversename.from_address(cleanarecord)
+
 
     #Print stuff
     print('Information found using system DNS settings:')
@@ -76,6 +82,7 @@ def main():
     print("ASN description is:", asndescription)
     print("ASN country is:", asncountry)
     print("ASN registrar is:", asnregistrar)
+    print("PTR record is:", ptrrecord)
 
     # Change to Google DNS
     print('-----')
@@ -119,6 +126,7 @@ def main():
     mxsrecord = dns.resolver.query(searchobject, 'MX')
     for rdata in mxsrecord: 
         cleanmxrecord2 = str(rdata)  
+    ptrrecord = dns.reversename.from_address(cleanarecord2)
     whoislookup = IPWhois(cleanarecord2)
     whoislookupresults2 = whoislookup.lookup_rdap(depth=1)
     for results in whoislookupresults2:
@@ -141,6 +149,7 @@ def main():
     print("ASN description is:", asndescription2)
     print("ASN country is:", asncountry2)
     print("ASN registrar is:", asnregistrar2)
+    print("PTR record is:", ptrrecord)
 
     sys.exit()
 
