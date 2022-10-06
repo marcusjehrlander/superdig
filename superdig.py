@@ -43,7 +43,7 @@ def main():
             sys.exit()
     cnamerecord = dns.resolver.query(searchobject, 'CNAME', raise_on_no_answer=False)
     if cnamerecord.rrset is None:
-        cleancnamerecord = str('None')
+        cleancnamerecord = str('None found')
     else:
         for rdata in cnamerecord:
             cleancnamerecord = str(rdata)
@@ -58,7 +58,7 @@ def main():
         for rdata in mxsrecord: 
             cleanmxrecord = str(rdata)
     except dns.resolver.NoAnswer:
-        cleanmxrecord = str('None')
+        cleanmxrecord = str('None found')
     try:   
         whoislookup = IPWhois(cleanarecord)
         whoislookupresults = whoislookup.lookup_rdap(depth=1)
@@ -90,6 +90,7 @@ def main():
     print("ASN registrar is:", asnregistrar)
     print("PTR record is:", ptrrecord)
 
+    # Don't check external DNS for internal domains
     internaldomain = re.compile('.domain.com')
     if internaldomain.search(searchobject):
         print('Internal domain, ending script.')
@@ -123,7 +124,7 @@ def main():
         sys.exit()
     cnamerecord = dns.resolver.query(searchobject, 'CNAME', raise_on_no_answer=False)
     if cnamerecord.rrset is None:
-        cleancnamerecord2 = str('None')
+        cleancnamerecord2 = str('None found')
     else:
         for rdata in cnamerecord:
             cleancnamerecord2 = str(rdata)
@@ -138,7 +139,7 @@ def main():
         for rdata in mxsrecord: 
             cleanmxrecord2 = str(rdata)  
     except dns.resolver.NoAnswer:
-        cleanmxrecord2 = str('None')
+        cleanmxrecord2 = str('None found')
     ptrrecord = dns.reversename.from_address(cleanarecord2)
     whoislookup = IPWhois(cleanarecord2)
     whoislookupresults2 = whoislookup.lookup_rdap(depth=1)
