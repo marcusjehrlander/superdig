@@ -7,7 +7,7 @@ import sys
 import json
 import ipwhois
 from ipwhois import IPWhois
-
+import re
 
 
 def main():
@@ -48,11 +48,13 @@ def main():
         for rdata in nsrecord:
             cleansnsrecord = str(rdata)
     except dns.resolver.NoAnswer:
-        print('NXDOMAIN, nothing found.')
-        sys.exit()
-    mxsrecord = dns.resolver.query(searchobject, 'MX')
-    for rdata in mxsrecord: 
-        cleanmxrecord = str(rdata)
+         print('None found')
+    try:
+        mxsrecord = dns.resolver.query(searchobject, 'MX')
+        for rdata in mxsrecord: 
+            cleanmxrecord = str(rdata)
+    except dns.resolver.NoAnswer:
+        cleanmxrecord = str('None')
     try:   
         whoislookup = IPWhois(cleanarecord)
         whoislookupresults = whoislookup.lookup_rdap(depth=1)
@@ -75,7 +77,7 @@ def main():
     print('Information found using system DNS settings:')
     print("A record:", cleanarecord)
     print("CNAME record:", cleancnamerecord)
-    print("NS record:", cleansnsrecord)
+    #print("NS record:", cleansnsrecord)
     print("MX record:", cleanmxrecord)   
     print("ASN is:", asn)
     print("ASN network is:", asnnetwork)
@@ -83,6 +85,11 @@ def main():
     print("ASN country is:", asncountry)
     print("ASN registrar is:", asnregistrar)
     print("PTR record is:", ptrrecord)
+
+    internaldomain = re.compile('.domain.com')
+    if internaldomain.search(searchobject):
+        print('Internal domain, ending script.')
+        sys.exit()
 
     # Change to Google DNS
     print('-----')
@@ -121,8 +128,7 @@ def main():
         for rdata in nsrecord:
             cleansnsrecord2 = str(rdata)
     except dns.resolver.NoAnswer:
-        print('NXDOMAIN, nothing found.')
-        sys.exit()
+        print('None found.')
     mxsrecord = dns.resolver.query(searchobject, 'MX')
     for rdata in mxsrecord: 
         cleanmxrecord2 = str(rdata)  
@@ -136,7 +142,7 @@ def main():
         asndescription2 = whoislookupresults2['asn_description']
         asnregistrar2 = whoislookupresults2['asn_registry']
 
-    if cleanarecord == cleanarecord2 and cleancnamerecord == cleancnamerecord2 and cleansnsrecord == cleansnsrecord and cleanmxrecord == cleanmxrecord2:
+    if cleanarecord == cleanarecord2 and cleancnamerecord == cleancnamerecord2 and cleansnsrecord == cleansnsrecord2 and cleanmxrecord == cleanmxrecord2:
         print('!!! Everything matches !!!')
         sys.exit()
 
