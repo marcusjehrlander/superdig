@@ -30,7 +30,6 @@ def main():
             cleanarecord = str(rdata)
     except dns.resolver.NXDOMAIN:
         try:
-            print('IP-address entered or invalid host entered, only checking WHOIS information and PTR record.')
             whoislookup = IPWhois(searchobject)
             whoislookupresults = whoislookup.lookup_rdap(depth=1)
             for results in whoislookupresults:
@@ -44,6 +43,7 @@ def main():
                     cleanptrrecord = resolver.query(checkptrrecord,"PTR")[0]
                 except dns.resolver.NXDOMAIN:
                      cleanptrrecord = ("None found")
+            print('IP-address entered or invalid host entered, only checking WHOIS information and PTR record.')
             print("ASN is:", asn)
             print("ASN network is:", asnnetwork)
             print("ASN description is:", asndescription)
@@ -64,8 +64,11 @@ def main():
         cnamerecord = dns.resolver.query(searchobject, 'CNAME', raise_on_no_answer=False)
     except dns.resolver.NXDOMAIN:
         print('Searched for private or non exisisting IP-address, checking PTR-record.')
-        checkptrrecord = dns.reversename.from_address(cleanarecord)
-        cleanptrrecord = resolver.query(checkptrrecord,"PTR")[0]
+        try:
+            checkptrrecord = dns.reversename.from_address(searchobject)
+            cleanptrrecord = resolver.query(checkptrrecord,"PTR")[0]
+        except dns.resolver.NXDOMAIN:
+            cleanptrrecord = ("None found")
         print("PTR record is:", cleanptrrecord)
         sys.exit()
     if cnamerecord.rrset is None:
