@@ -39,8 +39,11 @@ def main():
                 asncountry = whoislookupresults['asn_country_code']
                 asndescription = whoislookupresults['asn_description']
                 asnregistrar = whoislookupresults['asn_registry']
-                checkptrrecord = dns.reversename.from_address(searchobject)
-                cleanptrrecord = resolver.query(checkptrrecord,"PTR")[0]
+                try:
+                    checkptrrecord = dns.reversename.from_address(searchobject)
+                    cleanptrrecord = resolver.query(checkptrrecord,"PTR")[0]
+                except dns.resolver.NXDOMAIN:
+                     cleanptrrecord = ("None found")
             print("ASN is:", asn)
             print("ASN network is:", asnnetwork)
             print("ASN description is:", asndescription)
