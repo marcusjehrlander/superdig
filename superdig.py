@@ -8,7 +8,16 @@ import json
 import ipwhois
 from ipwhois import IPWhois
 import re
+import os
 
+def check_ping(pingtarget):
+    hostname = pingtarget
+    response = os.system("ping -c 1 -w 1 " + hostname)
+    if response == 0:
+        pingtargetstatus = "IP-address is reachable"
+    else:
+        pingtargetstatus = "IP address is not reachable"
+    
 
 def main():
     # Searching with built in DNS-server
@@ -30,13 +39,14 @@ def main():
                 asncountry = whoislookupresults['asn_country_code']
                 asndescription = whoislookupresults['asn_description']
                 asnregistrar = whoislookupresults['asn_registry']
-            ptrrecord = dns.reversename.from_address(searchobject)
+                checkptrrecord = dns.reversename.from_address(searchobject)
+                cleanptrrecord = resolver.query(checkptrrecord,"PTR")[0]
             print("ASN is:", asn)
             print("ASN network is:", asnnetwork)
             print("ASN description is:", asndescription)
             print("ASN country is:", asncountry)
             print("ASN registrar is:", asnregistrar)
-            print("PTR record is:", ptrrecord)
+            print("PTR record is:", cleanptrrecord)
             sys.exit()
         except ValueError:
             print('Nothing found.')
@@ -51,8 +61,9 @@ def main():
         cnamerecord = dns.resolver.query(searchobject, 'CNAME', raise_on_no_answer=False)
     except dns.resolver.NXDOMAIN:
         print('Searched for private or non exisisting IP-address, checking PTR-record.')
-        ptrrecord = dns.reversename.from_address(searchobject)
-        print("PTR record is:", ptrrecord)
+        checkptrrecord = dns.reversename.from_address(cleanarecord)
+        cleanptrrecord = resolver.query(checkptrrecord,"PTR")[0]
+        print("PTR record is:", cleanptrrecord)
         sys.exit()
     if cnamerecord.rrset is None:
         cleancnamerecord = str('None found')
@@ -86,8 +97,11 @@ def main():
             asncountry = ('Private IP, no information availible.')
             asndescription = ('Private IP, no information availible.')
             asnregistrar = ('Private IP, no information availible.')
-    ptrrecord = dns.reversename.from_address(cleanarecord)
-
+    checkptrrecord = dns.reversename.from_address(cleanarecord)
+    try:
+        cleanptrrecord = resolver.query(checkptrrecord,"PTR")[0]
+    except dns.resolver.NXDOMAIN:
+        cleanptrrecord = ("None found")
 
     #Print stuff
     print('Information found using system DNS settings:')
@@ -100,7 +114,11 @@ def main():
     print("ASN description is:", asndescription)
     print("ASN country is:", asncountry)
     print("ASN registrar is:", asnregistrar)
-    print("PTR record is:", ptrrecord)
+    print("PTR record is:", cleanptrrecord)
+
+    # Send ICMP to A-record
+    print('-----')
+    check_ping(cleanarecord)
 
     # Don't check external DNS for internal domains
     internaldomain = re.compile('.domain.com')
@@ -153,7 +171,11 @@ def main():
             cleanmxrecord2 = str(rdata)  
     except dns.resolver.NoAnswer:
         cleanmxrecord2 = str('None found')
-    ptrrecord = dns.reversename.from_address(cleanarecord2)
+    checkptrrecord2 = dns.reversename.from_address(cleanarecord2)
+    try:
+        cleanptrrecord2 = resolver.query(checkptrrecord2,"PTR")[0]
+    except dns.resolver.NXDOMAIN:
+        cleanptrrecord2 = ("None found")
     whoislookup = IPWhois(cleanarecord2)
     whoislookupresults2 = whoislookup.lookup_rdap(depth=1)
     for results in whoislookupresults2:
@@ -176,8 +198,7 @@ def main():
     print("ASN description is:", asndescription2)
     print("ASN country is:", asncountry2)
     print("ASN registrar is:", asnregistrar2)
-    print("PTR record is:", ptrrecord)
-
+    print("PTR record is:", cleanptrrecord2)
     sys.exit()
 
 if __name__ == '__main__':
