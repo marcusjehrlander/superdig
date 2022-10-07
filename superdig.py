@@ -41,7 +41,19 @@ def main():
         except ValueError:
             print('Nothing found.')
             sys.exit()
-    cnamerecord = dns.resolver.query(searchobject, 'CNAME', raise_on_no_answer=False)
+        except ipwhois.exceptions.IPDefinedError:
+            asn = ('Private IP, no information availible.')
+            asnnetwork = ('Private IP, no information availible.')
+            asncountry = ('Private IP, no information availible.')
+            asndescription = ('Private IP, no information availible.')
+            asnregistrar = ('Private IP, no information availible.') 
+    try:
+        cnamerecord = dns.resolver.query(searchobject, 'CNAME', raise_on_no_answer=False)
+    except dns.resolver.NXDOMAIN:
+        print('Searched for private or non exisisting IP-address, checking PTR-record.')
+        ptrrecord = dns.reversename.from_address(searchobject)
+        print("PTR record is:", ptrrecord)
+        sys.exit()
     if cnamerecord.rrset is None:
         cleancnamerecord = str('None found')
     else:
@@ -93,6 +105,7 @@ def main():
     # Don't check external DNS for internal domains
     internaldomain = re.compile('.domain.com')
     if internaldomain.search(searchobject):
+        print("-----")
         print('Internal domain, ending script.')
         sys.exit()
 
