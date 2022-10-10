@@ -91,6 +91,12 @@ def main():
             cleanmxrecord = str(rdata)
     except dns.resolver.NoAnswer:
         cleanmxrecord = str('None found')
+    try:
+        checkaaaarecord = dns.resolver.resolve(searchobject, 'AAAA')
+        for rdata in checkaaaarecord: 
+            cleanaaaarecord = str(rdata)
+    except dns.resolver.NoAnswer:
+        cleanaaaarecord = ("None found")
     try:   
         whoislookup = IPWhois(cleanarecord)
         whoislookupresults = whoislookup.lookup_rdap(depth=1)
@@ -112,9 +118,11 @@ def main():
     except dns.resolver.NXDOMAIN:
         cleanptrrecord = ("None found")
 
+
     #Print stuff
     print('Information found using system DNS settings:')
     print("A record:", cleanarecord)
+    print("AAAA record:", cleanaaaarecord)
     print("CNAME record:", cleancnamerecord)
     print("NS record:", cleansnsrecord)
     print("MX record:", cleanmxrecord)   
@@ -185,6 +193,12 @@ def main():
         cleanptrrecord2 = resolver.query(checkptrrecord2,"PTR")[0]
     except dns.resolver.NXDOMAIN:
         cleanptrrecord2 = ("None found")
+    try:
+        checkaaaarecord2 = dns.resolver.resolve(searchobject, 'AAAA')
+        for rdata in checkaaaarecord2: 
+            cleanaaaarecord2 = str(rdata)
+    except dns.resolver.NoAnswer:
+        cleanaaaarecord2 = ("None found")
     whoislookup = IPWhois(cleanarecord2)
     whoislookupresults2 = whoislookup.lookup_rdap(depth=1)
     for results in whoislookupresults2:
@@ -194,11 +208,12 @@ def main():
         asndescription2 = whoislookupresults2['asn_description']
         asnregistrar2 = whoislookupresults2['asn_registry']
 
-    if cleanarecord == cleanarecord2 and cleancnamerecord == cleancnamerecord2 and cleansnsrecord == cleansnsrecord2 and cleanmxrecord == cleanmxrecord2:
+    if cleanarecord == cleanarecord2 and cleancnamerecord == cleancnamerecord2 and cleansnsrecord == cleansnsrecord2 and cleanmxrecord == cleanmxrecord2 and cleanaaaarecord == cleanaaaarecord2:
         print('!!! Everything matches !!!')
         sys.exit()
 
     print("A record:", cleanarecord2)
+    print("AAAA record:", cleanaaaarecord2)
     print("CNAME record:", cleancnamerecord2)
     print("NS record:", cleansnsrecord2)
     print("MX record:", cleanmxrecord2)   
