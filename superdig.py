@@ -22,10 +22,13 @@ def check_ping(pingtarget):
 def main():
     # Searching with built in DNS-server
     resolver = dns.resolver.Resolver()
-    searchobject = input('Input domain or IP-address: ')
+    try:
+        searchobject = sys.argv[1]
+    except:
+        searchobject = input('Input domain or IP-address: ')
     print('-----')
     try: 
-        arecord = dns.resolver.query(searchobject, 'A')
+        arecord = dns.resolver.resolve(searchobject, 'A')
         for rdata in arecord:
             cleanarecord = str(rdata)
     except dns.resolver.NXDOMAIN:
@@ -61,7 +64,7 @@ def main():
             asndescription = ('Private IP, no information availible.')
             asnregistrar = ('Private IP, no information availible.') 
     try:
-        cnamerecord = dns.resolver.query(searchobject, 'CNAME', raise_on_no_answer=False)
+        cnamerecord = dns.resolver.resolve(searchobject, 'CNAME', raise_on_no_answer=False)
     except dns.resolver.NXDOMAIN:
         print('Searched for private or non exisisting IP-address, checking PTR-record.')
         try:
@@ -77,13 +80,13 @@ def main():
         for rdata in cnamerecord:
             cleancnamerecord = str(rdata)
     try: 
-        nsrecord = dns.resolver.query(searchobject, 'NS')
+        nsrecord = dns.resolver.resolve(searchobject, 'NS')
         for rdata in nsrecord:
             cleansnsrecord = str(rdata)
     except dns.resolver.NoAnswer:
          cleansnsrecord = str('None found')
     try:
-        mxsrecord = dns.resolver.query(searchobject, 'MX')
+        mxsrecord = dns.resolver.resolve(searchobject, 'MX')
         for rdata in mxsrecord: 
             cleanmxrecord = str(rdata)
     except dns.resolver.NoAnswer:
@@ -140,7 +143,7 @@ def main():
     dns.resolver.default_resolver.nameservers = ['8.8.8.8']
 
     try: 
-        arecord = dns.resolver.query(searchobject, 'A')
+        arecord = dns.resolver.resolve(searchobject, 'A')
         for rdata in arecord:
             cleanarecord2 = str(rdata)
     except dns.resolver.NXDOMAIN:
@@ -159,20 +162,20 @@ def main():
         print("ASN country is:", asncountry2)
         print("ASN registrar is:", asnregistrar2)
         sys.exit()
-    cnamerecord = dns.resolver.query(searchobject, 'CNAME', raise_on_no_answer=False)
+    cnamerecord = dns.resolver.resolve(searchobject, 'CNAME', raise_on_no_answer=False)
     if cnamerecord.rrset is None:
         cleancnamerecord2 = str('None found')
     else:
         for rdata in cnamerecord:
             cleancnamerecord2 = str(rdata)
     try: 
-        nsrecord = dns.resolver.query(searchobject, 'NS')
+        nsrecord = dns.resolver.resolve(searchobject, 'NS')
         for rdata in nsrecord:
             cleansnsrecord2 = str(rdata)
     except dns.resolver.NoAnswer:
         cleansnsrecord2 = str('None found')
     try:
-        mxsrecord = dns.resolver.query(searchobject, 'MX')
+        mxsrecord = dns.resolver.resolve(searchobject, 'MX')
         for rdata in mxsrecord: 
             cleanmxrecord2 = str(rdata)  
     except dns.resolver.NoAnswer:
