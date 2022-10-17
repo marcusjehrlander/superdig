@@ -66,7 +66,7 @@ def main():
     try:
         cnamerecord = dns.resolver.resolve(searchobject, 'CNAME', raise_on_no_answer=False)
     except dns.resolver.NXDOMAIN:
-        print('Searched for private or non exisisting IP-address, checking PTR-record.')
+        print('Searched for private or non existing IP-address, checking PTR-record.')
         try:
             checkptrrecord = dns.reversename.from_address(searchobject)
             cleanptrrecord = resolver.query(checkptrrecord,"PTR")[0]
