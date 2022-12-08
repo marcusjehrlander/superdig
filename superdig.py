@@ -149,6 +149,9 @@ def main():
         print('Internal domain, ending script.')
         sys.exit()
 
+    if asndescription == ('Private IP, no information availible.'):
+        sys.exit()
+
     # Change to Google DNS
     print('-----')
     print('Verifying with Google DNS servers.')
