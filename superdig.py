@@ -43,9 +43,11 @@ def main():
                 asnregistrar = whoislookupresults['asn_registry']
                 try:
                     checkptrrecord = dns.reversename.from_address(searchobject)
-                    cleanptrrecord = resolver.query(checkptrrecord,"PTR")[0]
+                    cleanptrrecord = dns.resolver.resolve(checkptrrecord,"PTR")[0]
                 except dns.resolver.NXDOMAIN:
                      cleanptrrecord = ("None found")
+                except dns.resolver.NoNameservers:
+                    cleanptrrecord = ("None found")
             print('IP-address entered or invalid host entered, only checking WHOIS information and PTR record.')
             print("ASN is:", asn)
             print("ASN network is:", asnnetwork)
@@ -63,6 +65,9 @@ def main():
             asncountry = ('Private IP, no information availible.')
             asndescription = ('Private IP, no information availible.')
             asnregistrar = ('Private IP, no information availible.') 
+    except dns.resolver.NoAnswer:
+        print("Nothing found.")
+        sys.exit()
     try:
         cnamerecord = dns.resolver.resolve(searchobject, 'CNAME', raise_on_no_answer=False)
     except dns.resolver.NXDOMAIN:
@@ -114,7 +119,7 @@ def main():
             asnregistrar = ('Private IP, no information availible.')
     checkptrrecord = dns.reversename.from_address(cleanarecord)
     try:
-        cleanptrrecord = resolver.query(checkptrrecord,"PTR")[0]
+        cleanptrrecord = dns.resolver.resolve(checkptrrecord,"PTR")[0]
     except dns.resolver.NXDOMAIN:
         cleanptrrecord = ("None found")
 
@@ -138,7 +143,7 @@ def main():
     check_ping(cleanarecord)
 
     # Don't check external DNS for internal domains
-    internaldomain = re.compile('.domain.com')
+    internaldomain = re.compile('.test.se')
     if internaldomain.search(searchobject):
         print("-----")
         print('Internal domain, ending script.')
@@ -190,7 +195,7 @@ def main():
         cleanmxrecord2 = str('None found')
     checkptrrecord2 = dns.reversename.from_address(cleanarecord2)
     try:
-        cleanptrrecord2 = resolver.query(checkptrrecord2,"PTR")[0]
+        cleanptrrecord2 = dns.resolver.resolve(checkptrrecord2,"PTR")[0]
     except dns.resolver.NXDOMAIN:
         cleanptrrecord2 = ("None found")
     try:
