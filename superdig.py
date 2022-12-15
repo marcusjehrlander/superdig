@@ -74,7 +74,7 @@ def main():
         print('Searched for private or non existing IP-address, checking PTR-record.')
         try:
             checkptrrecord = dns.reversename.from_address(searchobject)
-            cleanptrrecord = resolver.query(checkptrrecord,"PTR")[0]
+            cleanptrrecord = dns.resolver.resolve(checkptrrecord,"PTR")[0]
         except dns.resolver.NXDOMAIN:
             cleanptrrecord = ("None found")
         print("PTR record is:", cleanptrrecord)
